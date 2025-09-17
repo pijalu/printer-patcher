@@ -1,0 +1,11 @@
+# Patcher Actions
+username: "linaro"
+password: "linaro"
+actions:
+  - title: "Test connection"
+    description: "Test SSH connection to printer"
+    steps:
+      - title: "Echo test"
+        description: "Send echo command to verify connection"
+        script: "scripts/test-connection.sh"
+        expected: "working"
