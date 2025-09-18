@@ -172,7 +172,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/fyne-cross/dist/linux-arm64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-binaries/linux-arm64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-arm64.tar.xz
         asset_content_type: application/x-xz
 
@@ -182,7 +182,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/fyne-cross/dist/linux-amd64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-binaries/linux-amd64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-amd64.tar.xz
         asset_content_type: application/x-xz
 
@@ -192,7 +192,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/fyne-cross/dist/windows-arm64/PrinterPatcher.zip
+        asset_path: ./linux-windows-binaries/windows-arm64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-arm64.zip
         asset_content_type: application/zip
 
@@ -202,7 +202,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/fyne-cross/dist/windows-amd64/PrinterPatcher.zip
+        asset_path: ./linux-windows-binaries/windows-amd64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-amd64.zip
         asset_content_type: application/zip
 
