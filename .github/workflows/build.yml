@@ -18,10 +18,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Cache apt dependencies
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/build-cross.sh') }}
+
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.24'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Install dependencies
       run: |
@@ -54,6 +70,16 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.24'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Install fyne
       run: go install fyne.io/tools/cmd/fyne@latest
@@ -146,7 +172,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/linux_arm64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-binaries/fyne-cross/dist/linux-arm64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-arm64.tar.xz
         asset_content_type: application/x-xz
 
@@ -156,7 +182,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/linux_amd64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-binaries/fyne-cross/dist/linux-amd64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-amd64.tar.xz
         asset_content_type: application/x-xz
 
@@ -166,9 +192,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/windows_arm64/PrinterPatcher.exe
-        asset_name: PrinterPatcher-windows-arm64.exe
-        asset_content_type: application/vnd.microsoft.portable-executable
+        asset_path: ./linux-windows-binaries/fyne-cross/dist/windows-arm64/PrinterPatcher.zip
+        asset_name: PrinterPatcher-windows-arm64.zip
+        asset_content_type: application/zip
 
     - name: Upload Windows AMD64 Release Asset
       uses: actions/upload-release-asset@v1
@@ -176,9 +202,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/windows_amd64/PrinterPatcher.exe
-        asset_name: PrinterPatcher-windows-amd64.exe
-        asset_content_type: application/vnd.microsoft.portable-executable
+        asset_path: ./linux-windows-binaries/fyne-cross/dist/windows-amd64/PrinterPatcher.zip
+        asset_name: PrinterPatcher-windows-amd64.zip
+        asset_content_type: application/zip
 
     - name: Upload macOS Release Asset
       uses: actions/upload-release-asset@v1
