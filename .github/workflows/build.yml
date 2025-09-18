@@ -29,16 +29,6 @@ jobs:
       with:
         go-version: '1.24'
 
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/go/pkg/mod
-          ~/.cache/go-build
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -70,16 +60,6 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.24'
-
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/go/pkg/mod
-          ~/.cache/go-build
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
 
     - name: Install fyne
       run: go install fyne.io/tools/cmd/fyne@latest
