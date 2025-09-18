@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y golang gcc libgl1-mesa-dev xorg-dev libxkbcommon-dev g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64
+        sudo apt-get install -y golang
 
     - name: Install fyne
       run: go install fyne.io/tools/cmd/fyne@latest
@@ -88,6 +88,8 @@ jobs:
   release:
     needs: [build-linux, build-macos]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: startsWith(github.ref, 'refs/heads/release/')
     steps:
     - name: Checkout code
