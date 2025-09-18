@@ -113,6 +113,10 @@ Each step has:
 
 Default SSH credentials are linaro/linaro.
 
+## MacOS install
+If you downloaded and installed the app but are greeted with a corrupted name: 
+`xattr -cr /Applications/PrinterPatcher.app`
+
 ## Script Directory
 The application includes scripts in the `config/scripts/` directory.
 
