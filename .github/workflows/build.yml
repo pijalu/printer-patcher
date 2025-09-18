@@ -1,10 +1,13 @@
-name: Build
+name: Build and Release
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  push:
+    branches:
+      - 'release/**'
 
 jobs:
   build-linux:
@@ -56,9 +59,129 @@ jobs:
     - name: Build for macOS
       run: ./build.sh
 
+    - name: Create macOS DMG
+      run: |
+        cd dist/current
+        # Create a temporary directory for the DMG
+        mkdir -p dmg_tmp
+        cp -R "PrinterPatcher.app" dmg_tmp/
+        
+        # Create symbolic link to Applications
+        ln -s /Applications dmg_tmp/Applications
+        
+        # Create the DMG
+        hdiutil create -volname "PrinterPatcher" -srcfolder dmg_tmp -ov -format UDZO "../PrinterPatcher.dmg"
+        
+        # Clean up
+        rm -rf dmg_tmp
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: macos-binary
         path: |
           dist/current/
+          dist/PrinterPatcher.dmg
+
+  release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/release/')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Extract release info from branch name
+      id: extract_release_info
+      run: |
+        # Extract branch name
+        BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+        echo "Branch name: $BRANCH_NAME"
+        
+        # Extract printer name and version from branch name
+        # Format: release/printername_version (e.g., release/artillery-m1-pro_1.0.11.0)
+        if [[ $BRANCH_NAME =~ release/([^_]+)_(.*) ]]; then
+          PRINTER_NAME="${BASH_REMATCH[1]}"
+          VERSION="${BASH_REMATCH[2]}"
+          echo "Printer name: $PRINTER_NAME"
+          echo "Version: $VERSION"
+          
+          # Convert printer name to title case (replace hyphens with spaces and capitalize)
+          PRINTER_TITLE=$(echo "$PRINTER_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))} 1')
+          echo "Printer title: $PRINTER_TITLE"
+          
+          # Create release name
+          RELEASE_NAME="$PRINTER_TITLE version $VERSION"
+          echo "Release name: $RELEASE_NAME"
+          
+          echo "printer_name=$PRINTER_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
+        else
+          echo "Branch name does not match expected format"
+          exit 1
+        fi
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.extract_release_info.outputs.version }}
+        release_name: ${{ steps.extract_release_info.outputs.release_name }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux ARM64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-windows-binaries/linux_arm64/PrinterPatcher.tar.xz
+        asset_name: PrinterPatcher-linux-arm64.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Upload Linux AMD64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-windows-binaries/linux_amd64/PrinterPatcher.tar.xz
+        asset_name: PrinterPatcher-linux-amd64.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Upload Windows ARM64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-windows-binaries/windows_arm64/PrinterPatcher.exe
+        asset_name: PrinterPatcher-windows-arm64.exe
+        asset_content_type: application/vnd.microsoft.portable-executable
+
+    - name: Upload Windows AMD64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-windows-binaries/windows_amd64/PrinterPatcher.exe
+        asset_name: PrinterPatcher-windows-amd64.exe
+        asset_content_type: application/vnd.microsoft.portable-executable
+
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./macos-binary/PrinterPatcher.dmg
+        asset_name: PrinterPatcher-macos.dmg
+        asset_content_type: application/x-apple-diskimage
