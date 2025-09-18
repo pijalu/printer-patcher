@@ -216,7 +216,7 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 
 func showActionExecutionDialog(window fyne.Window, ip string, cfg *config.Config, selectedAction int) {
 	if cfg == nil || selectedAction < 0 || selectedAction >= len(cfg.Actions) {
-		dialog.ShowError(fmt.Errorf("No action selected"), window)
+		dialog.ShowError(fmt.Errorf("no action selected"), window)
 		return
 	}
 	action := cfg.Actions[selectedAction]
@@ -276,25 +276,24 @@ func showActionExecutionDialog(window fyne.Window, ip string, cfg *config.Config
 
 			if err != nil {
 				fyne.Do(func() {
+					output.SetText(output.Text + fmt.Sprintf("\n📋 Output:\n%s", result))
 					output.SetText(output.Text + fmt.Sprintf("\n❌ Error in step '%s': %v", step.Title, err))
 				})
 				break
 			}
-			if result != "" {
-				fyne.Do(func() {
-					output.SetText(output.Text + fmt.Sprintf("\n📋 Output:\n%s", result))
-				})
-			}
 
 			if tools.ValidateOutput(strings.TrimSpace(result), step.Expected) {
 				fyne.Do(func() {
-					output.SetText(output.Text + fmt.Sprintf("\n✓ Step '%s' completed successfully", step.Title))
+					output.SetText(output.Text + fmt.Sprintf("\n✓ Step completed successfully"))
 				})
 				successfulSteps++
 			} else {
 				fyne.Do(func() {
-					output.SetText(output.Text + fmt.Sprintf("\n✗ Step '%s' failed validation. Expected: '%s', Got: '%s'",
-						step.Title, step.Expected, strings.TrimSpace(result)))
+					if result != "" {
+						output.SetText(output.Text + fmt.Sprintf("\n📋 Output:\n%s", result))
+					}
+					output.SetText(output.Text + fmt.Sprintf("\n✗ Step failed validation. Expected: '%s', Got: '%s'",
+						step.Expected, strings.TrimSpace(result)))
 				})
 				break
 			}
@@ -307,7 +306,7 @@ func showActionExecutionDialog(window fyne.Window, ip string, cfg *config.Config
 			if successfulSteps == totalSteps {
 				dialog.ShowInformation("Success", fmt.Sprintf("All %d steps completed successfully!", totalSteps), window)
 			} else {
-				dialog.ShowError(fmt.Errorf("Only %d/%d steps completed successfully", successfulSteps, totalSteps), window)
+				dialog.ShowError(fmt.Errorf("only %d/%d steps completed successfully", successfulSteps, totalSteps), window)
 			}
 		})
 	}
