@@ -21,3 +21,7 @@ actions:
         description: "Upgrade moonraker to community version"
         script: "scripts/upgrade-moonraker.sh"
         expected: ".*\\[OK\\]\\ moonraker:\\ https://github\\.com/pijalu/artillery\\-m1\\-moonraker\\.git\\ \\-\\ feature/diy\\-macros"
+      - title: "Update Klipper"
+        description: "Update klipper to community version"
+        script: "scripts/update-klipper.sh"
+        expected: ".*\\[OK\\] - Klipper update"
