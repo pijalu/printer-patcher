@@ -27,3 +27,18 @@ func LoadStep(step string) (string, error) {
 	}
 	return string(data), nil
 }
+
+// LoadConfigFromData loads configuration from raw data
+func LoadConfigFromData(data []byte) (*Config, error) {
+	var config Config
+	err := yaml.Unmarshal(data, &config)
+	if err != nil {
+		return nil, err
+	}
+	return &config, nil
+}
+
+// LoadStepFromData loads step content from raw data
+func LoadStepFromData(data []byte) string {
+	return string(data)
+}

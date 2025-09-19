@@ -1,0 +1,4 @@
+# Repository Configuration
+repositories:
+  - owner: pijalu
+    name: printer-patcher
