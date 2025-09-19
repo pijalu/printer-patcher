@@ -22,7 +22,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: /var/cache/apt
-        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/build-cross.sh') }}
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/build-linux.sh') }}
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -40,13 +40,89 @@ jobs:
     - name: Install fyne-cross
       run: go install github.com/fyne-io/fyne-cross@latest
 
-    - name: Build for Linux, Windows, and Android
-      run: ./build-cross.sh
+    - name: Build for Linux
+      run: ./build-linux.sh
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: linux-windows-android-binaries
+        name: linux-binaries
+        path: |
+          fyne-cross/dist/
+          
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Cache apt dependencies
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/build-windows.sh') }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y golang
+
+    - name: Install fyne
+      run: go install fyne.io/tools/cmd/fyne@latest
+    
+    - name: Install fyne-cross
+      run: go install github.com/fyne-io/fyne-cross@latest
+
+    - name: Build for Windows
+      run: ./build-windows.sh
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-binaries
+        path: |
+          fyne-cross/dist/
+          
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Cache apt dependencies
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-cache-${{ hashFiles('**/build-android.sh') }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y golang
+
+    - name: Install fyne
+      run: go install fyne.io/tools/cmd/fyne@latest
+    
+    - name: Install fyne-cross
+      run: go install github.com/fyne-io/fyne-cross@latest
+
+    - name: Build for Android
+      run: ./build-android.sh
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-binaries
         path: |
           fyne-cross/dist/
 
@@ -92,7 +168,7 @@ jobs:
           dist/PrinterPatcher.dmg
 
   release:
-    needs: [build-linux, build-macos]
+    needs: [build-linux, build-windows, build-android, build-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -103,6 +179,9 @@ jobs:
 
     - name: Download all artifacts
       uses: actions/download-artifact@v4
+
+    - name: List downloaded artifacts
+      run: ls -la
 
     - name: Extract release info from branch name
       id: extract_release_info
@@ -152,7 +231,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-android-binaries/linux-arm64/PrinterPatcher.tar.xz
+        asset_path: ./linux-binaries/linux-arm64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-arm64.tar.xz
         asset_content_type: application/x-xz
 
@@ -162,7 +241,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-android-binaries/linux-amd64/PrinterPatcher.tar.xz
+        asset_path: ./linux-binaries/linux-amd64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-amd64.tar.xz
         asset_content_type: application/x-xz
 
@@ -172,7 +251,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-android-binaries/windows-arm64/PrinterPatcher.zip
+        asset_path: ./windows-binaries/windows-arm64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-arm64.zip
         asset_content_type: application/zip
 
@@ -182,7 +261,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-android-binaries/windows-amd64/PrinterPatcher.zip
+        asset_path: ./windows-binaries/windows-amd64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-amd64.zip
         asset_content_type: application/zip
 
@@ -192,7 +271,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-android-binaries/android-arm64/PrinterPatcher.apk
+        asset_path: ./android-binaries/android-arm64/PrinterPatcher.apk
         asset_name: PrinterPatcher-android-arm64.apk
         asset_content_type: application/vnd.android.package-archive
 
