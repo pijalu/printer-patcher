@@ -40,13 +40,13 @@ jobs:
     - name: Install fyne-cross
       run: go install github.com/fyne-io/fyne-cross@latest
 
-    - name: Build for Linux and Windows
+    - name: Build for Linux, Windows, and Android
       run: ./build-cross.sh
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: linux-windows-binaries
+        name: linux-windows-android-binaries
         path: |
           fyne-cross/dist/
 
@@ -152,7 +152,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/linux-arm64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-android-binaries/linux-arm64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-arm64.tar.xz
         asset_content_type: application/x-xz
 
@@ -162,7 +162,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/linux-amd64/PrinterPatcher.tar.xz
+        asset_path: ./linux-windows-android-binaries/linux-amd64/PrinterPatcher.tar.xz
         asset_name: PrinterPatcher-linux-amd64.tar.xz
         asset_content_type: application/x-xz
 
@@ -172,7 +172,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/windows-arm64/PrinterPatcher.zip
+        asset_path: ./linux-windows-android-binaries/windows-arm64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-arm64.zip
         asset_content_type: application/zip
 
@@ -182,9 +182,19 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-windows-binaries/windows-amd64/PrinterPatcher.zip
+        asset_path: ./linux-windows-android-binaries/windows-amd64/PrinterPatcher.zip
         asset_name: PrinterPatcher-windows-amd64.zip
         asset_content_type: application/zip
+
+    - name: Upload Android ARM64 Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-windows-android-binaries/android-arm64/PrinterPatcher.apk
+        asset_name: PrinterPatcher-android-arm64.apk
+        asset_content_type: application/vnd.android.package-archive
 
     - name: Upload macOS Release Asset
       uses: actions/upload-release-asset@v1

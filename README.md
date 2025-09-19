@@ -48,7 +48,14 @@ The executable will be created in the directory dist/current.
 ./build-cross.sh
 ```
 
-This will create a packaged version for windows and linux (arm64 / amd64). Output will be located in fyne-cross/dist
+This will create a packaged version for windows, linux (arm64 / amd64) and Android ARM64. Output will be located in fyne-cross/dist
+
+### Building for Android only:
+```bash
+./build-android.sh
+```
+
+This will create an APK for Android ARM64. Output will be located in fyne-cross/dist
 
 ### Manual build:
 
