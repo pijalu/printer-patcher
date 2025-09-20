@@ -187,6 +187,16 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 	}
 	actionList.Select(widget.ListItemID(0))
 
+	// Create bottom buttons - only show Quit button on non-mobile platforms
+	bottomButtons := container.NewVBox(executeButton)
+	
+	// Only add Quit button on non-mobile platforms
+	if !fyne.CurrentDevice().IsMobile() {
+		bottomButtons.Add(widget.NewButton("Quit", func() {
+			window.Close()
+		}))
+	}
+
 	content := container.NewBorder(
 		/* top */
 		container.NewVBox(
@@ -194,12 +204,7 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 			ipEntry,
 		),
 		/* Bottom */
-		container.NewVBox(
-			executeButton,
-			widget.NewButton("Quit", func() {
-				window.Close()
-			}),
-		),
+		bottomButtons,
 		/* left */ nil,
 		/* right */ nil,
 		/* Content */
