@@ -152,7 +152,7 @@ jobs:
         cp -R "PrinterPatcher.app" dmg_tmp/
         
         # Copy part of README to the DMG
-        sed -n '/^## MacOS install/,/^## /{/^## /!p;}' README.md > dmg_tmp/README.txt
+        sed -n '/^## MacOS install/,/^## /{/^## /!p;}' ../../README.md > dmg_tmp/README.txt
         
         # Create symbolic link to Applications
         ln -s /Applications dmg_tmp/Applications
