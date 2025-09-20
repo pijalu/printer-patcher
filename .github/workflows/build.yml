@@ -150,6 +150,9 @@ jobs:
         mkdir -p dmg_tmp
         cp -R "PrinterPatcher.app" dmg_tmp/
         
+        # Copy part of README to the DMG
+        sed -n '/^## MacOS install/,/^## /{/^## /!p;}' README.md > dmg_tmp/README.txt
+        
         # Create symbolic link to Applications
         ln -s /Applications dmg_tmp/Applications
         
@@ -172,7 +175,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: startsWith(github.ref, 'refs/heads/release/') || github.ref == 'refs/heads/prerelease/printer-version'
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -190,28 +193,40 @@ jobs:
         BRANCH_NAME="${GITHUB_REF#refs/heads/}"
         echo "Branch name: $BRANCH_NAME"
         
-        # Extract printer name and version from branch name
-        # Format: release/printername_version (e.g., release/artillery-m1-pro_1.0.11.0)
-        if [[ $BRANCH_NAME =~ release/([^_]+)_(.*) ]]; then
-          PRINTER_NAME="${BASH_REMATCH[1]}"
-          VERSION="${BASH_REMATCH[2]}"
-          echo "Printer name: $PRINTER_NAME"
-          echo "Version: $VERSION"
-          
-          # Convert printer name to title case (replace hyphens with spaces and capitalize)
-          PRINTER_TITLE=$(echo "$PRINTER_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))} 1')
-          echo "Printer title: $PRINTER_TITLE"
-          
-          # Create release name
-          RELEASE_NAME="$PRINTER_TITLE version $VERSION"
-          echo "Release name: $RELEASE_NAME"
-          
+        # Handle prerelease branch differently
+        if [[ "$BRANCH_NAME" == "prerelease/printer-version" ]]; then
+          # For prerelease, use a generic name with timestamp
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          PRINTER_NAME="testing"
+          VERSION="0.0.0-$TIMESTAMP"
+          RELEASE_NAME="Testing Release $TIMESTAMP"
           echo "printer_name=$PRINTER_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
         else
-          echo "Branch name does not match expected format"
-          exit 1
+          # Extract printer name and version from branch name
+          # Format: release/printername_version (e.g., release/artillery-m1-pro_1.0.11.0)
+          if [[ $BRANCH_NAME =~ release/([^_]+)_(.*) ]]; then
+            PRINTER_NAME="${BASH_REMATCH[1]}"
+            VERSION="${BASH_REMATCH[2]}"
+            echo "Printer name: $PRINTER_NAME"
+            echo "Version: $VERSION"
+            
+            # Convert printer name to title case (replace hyphens with spaces and capitalize)
+            PRINTER_TITLE=$(echo "$PRINTER_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))} 1')
+            echo "Printer title: $PRINTER_TITLE"
+            
+            # Create release name
+            RELEASE_NAME="$PRINTER_TITLE version $VERSION"
+            echo "Release name: $RELEASE_NAME"
+            
+            echo "printer_name=$PRINTER_NAME" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "Branch name does not match expected format"
+            exit 1
+          fi
         fi
 
     - name: Create Release

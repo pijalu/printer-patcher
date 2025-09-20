@@ -121,8 +121,14 @@ Each step has:
 Default SSH credentials are linaro/linaro.
 
 ## MacOS install
-If you downloaded and installed the app but are greeted with a corrupted name: 
-`xattr -cr /Applications/PrinterPatcher.app`
+If you downloaded and installed the app but are greeted with a security warning or the app appears to be corrupted, you need to perform these steps:
+
+1. Copy PrinterPatcher.app to your Applications folder
+2. Open Terminal and run the following command:
+   `xattr -cr /Applications/PrinterPatcher.app`
+
+This is necessary because we don't have an Apple Developer certificate to sign the application.
+After running this command, you should be able to launch PrinterPatcher from your Applications folder.
 
 ## Script Directory
 The application includes scripts in the `config/scripts/` directory.
