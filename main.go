@@ -189,7 +189,7 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 
 	// Create bottom buttons - only show Quit button on non-mobile platforms
 	bottomButtons := container.NewVBox(executeButton)
-	
+
 	// Only add Quit button on non-mobile platforms
 	if !fyne.CurrentDevice().IsMobile() {
 		bottomButtons.Add(widget.NewButton("Quit", func() {
@@ -208,9 +208,14 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 		/* left */ nil,
 		/* right */ nil,
 		/* Content */
-		container.NewVBox( // Top content
-			widget.NewLabelWithStyle("Actions", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}),
-			widget.NewSeparator(),
+		container.NewBorder(
+			container.NewVBox(
+				widget.NewLabelWithStyle("Actions", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}),
+				widget.NewSeparator(),
+			),
+			nil,
+			nil,
+			nil,
 			actionList,
 		),
 	)
