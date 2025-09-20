@@ -18,9 +18,13 @@ else
     echo "* Already running in factory mode"
 fi
 
-if [ "$CHANGES" == "1" ]; then 
+if [ "$CHANGES" == "1" ]; then
+    # Force rename of fluidd now
+    sudo mv /home/mks/ws/wyd /home/mks/fluidd
+    # Do restart mksclient
     echo "* Restarting makerbase client (LCD)"
     sudo systemctl restart makerbase-client || exit $LINENO
+    # Restart NGINX
     echo "* Restarting NGINX (server)"
     sudo systemctl restart nginx || exit $LINENO
 else
