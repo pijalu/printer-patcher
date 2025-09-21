@@ -51,5 +51,5 @@ After running the tool:
 
 If your printer becomes unresponsive or doesn't work properly after running this tool:
 1. Try restarting the printer
-2. If that doesn't work, you may need to reflash the firmware using a USB drive
+2. If that doesn't work, you may need to reflash the firmware using [USB OTG](https://wiki.artillery3d.com/m1/manual/flashing-guide)
 3. Contact support with details about what happened
