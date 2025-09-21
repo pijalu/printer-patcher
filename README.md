@@ -2,6 +2,8 @@
 A cross-platform GUI tool for patching 3D printers via SSH.
 The use case is to provide an easier way to install/patch typical 3D printer via SSH.
 
+Before running this tool, please read [what the tool does and important warnings](RUN.md).
+
 ## Features
 
 - Cross-platform GUI (Windows, macOS, Linux)
