@@ -12,7 +12,7 @@ When you run this tool, it performs the following actions on your printer:
 
 3. **Updates Moonraker** - Installs the latest version of Moonraker, which is the communication layer between the web interface and your printer's control system. This update includes special fixes for Artillery printers.
 
-4. **Updates Klipper macros ** - Installs community updated macros that addresses common issues with the printer's operation.
+4. **Updates Klipper macros** - Installs community updated macros that addresses common issues with the printer's operation.
 
 5. **Applies Artillery-Specific Fixes**:
    - Fixes macro commands that help prevent clogging of the extruder
@@ -28,7 +28,7 @@ This tool modifies software on your printer. While it has been tested, there is 
 
 ### ⏱️ Updates Continue After Tool Exits
 After the tool finishes running, the actual updating process continues on the printer itself:
-- This can take more than 10 minutes to complete
+- After you finish update process *do not turn off the printer*. http://printerip:8078 will show bad gateway error *for ~10 mins*. When update process will be finished you'll be able to use Fluidd.
 - Do not turn off your printer during this time
 - You can monitor the progress through the FLUIDD web interface at: http://printerip:8078 (replace "printerip" with your printer's actual IP address)
 
