@@ -15,9 +15,16 @@ type Action struct {
 	Steps       []Step `yaml:"steps"`
 }
 
+// Diagnotics represents a diagnostic action that can be executed on the printer
+type Diagnotics struct {
+	Title string `yaml:"title"`
+	Shell string `yaml:"shell"`
+}
+
 // Config represents the configuration file structure
 type Config struct {
-	Username string   `yaml:"username"`
-	Password string   `yaml:"password"`
-	Actions  []Action `yaml:"actions"`
+	Username   string       `yaml:"username"`
+	Password   string       `yaml:"password"`
+	Diagnotics []Diagnotics `yaml:"diagnostics"`
+	Actions    []Action     `yaml:"actions"`
 }

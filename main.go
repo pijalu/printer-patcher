@@ -22,6 +22,8 @@ func main() {
 		return
 	}
 
+	//fmt.Printf("Loaded configuration: %v\n", config)
+
 	// Command line flags
 	headlessMode := flag.Bool("headless", false, "Run in headless mode")
 	ipAddress := flag.String("ip", "", "Printer IP address (for headless mode)")
@@ -187,9 +189,16 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 	}
 	actionList.Select(widget.ListItemID(0))
 
+	dia := container.NewHBox(widget.NewLabel("Diagnotics:"))
+	for _, d := range config.Diagnotics {
+		d := d // Capture range variable
+		dia.Add(widget.NewButton(d.Title, func() {
+			showDiagnosticDialog(window, ipEntry.Text, config, d)
+		}))
+	}
+
 	// Create bottom buttons - only show Quit button on non-mobile platforms
 	bottomButtons := container.NewVBox(executeButton)
-
 	// Only add Quit button on non-mobile platforms
 	if !fyne.CurrentDevice().IsMobile() {
 		bottomButtons.Add(widget.NewButton("Quit", func() {
@@ -216,7 +225,13 @@ func createScreen(window fyne.Window, config *config.Config) fyne.CanvasObject {
 			nil,
 			nil,
 			nil,
-			actionList,
+			container.NewBorder(
+				nil,
+				dia,
+				nil,
+				nil,
+				actionList,
+			),
 		),
 	)
 
@@ -337,5 +352,65 @@ func showActionExecutionDialog(window fyne.Window, ip string, cfg *config.Config
 	executionDialog.Show()
 
 	// Run in it's own thread
+	go execFn()
+}
+
+func showDiagnosticDialog(window fyne.Window, ip string, cfg *config.Config, diagnostic config.Diagnotics) {
+	if ip == "" {
+		dialog.ShowError(fmt.Errorf("please enter an IP address"), window)
+		return
+	}
+
+	output := widget.NewTextGrid()
+	output.Append(fmt.Sprintf("Connecting to: %s\n", ip))
+
+	scrollContainer := container.NewScroll(output)
+	scrollContainer.SetMinSize(fyne.NewSize(700, 400))
+
+	dialogContent := container.NewBorder(
+		nil,
+		nil,
+		nil,
+		nil,
+		scrollContainer,
+	)
+
+	diagDialog := dialog.NewCustom(diagnostic.Title, "Close", dialogContent, window)
+	diagDialog.Resize(fyne.NewSize(800, 500))
+	diagDialog.Show()
+
+	execFn := func() {
+		sshClient := tools.NewSSHConfig(ip, 22, cfg.Username, cfg.Password, "")
+		if err := sshClient.Connect(); err != nil {
+			fyne.Do(func() {
+				output.Append(fmt.Sprintf("Error connecting to printer: %v\n", err))
+			})
+			return
+		}
+		defer sshClient.Close()
+
+		fyne.Do(func() {
+			output.Append("Connected successfully!\n")
+		})
+
+		session, err := sshClient.Client.NewSession()
+		if err != nil {
+			fyne.Do(func() {
+				output.Append(fmt.Sprintf("Error starting session: %v\n", err))
+			})
+			return
+		}
+		defer session.Close()
+		session.Stdout = tools.NewWidgetWriter(output)
+
+		if err := session.Start(diagnostic.Shell); err != nil {
+			fyne.Do(func() {
+				output.Append(fmt.Sprintf("Error starting shell: %v\n", err))
+			})
+			return
+		}
+		session.Wait()
+	}
+
 	go execFn()
 }

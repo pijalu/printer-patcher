@@ -1,6 +1,15 @@
 # Patcher Actions
 username: "linaro"
 password: "linaro"
+diagnostics:
+  - title: "Moonraker logs"
+    shell: "sudo tail -fn 100 /home/mks/printer_data/logs/moonraker.log"
+  - title: "Klipper logs"
+    shell: "sudo tail -fn 100 /home/mks/printer_data/logs/klippy.log"
+  - title: "Serials"
+    shell: "ls -ltr /dev/serial/by-id"
+  - title: "USB"
+    shell: "lsusb -vt"
 actions:
   - title: "Enable FLUIDD"
     description: "(RE)Enable FLUIDD access"
