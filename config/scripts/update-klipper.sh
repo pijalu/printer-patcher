@@ -174,6 +174,7 @@ done
 # Restart services if changes were made
 if [ "$CHANGES_MADE" -eq 1 ]; then
     echo "Restarting Klipper and Moonraker services..."
+    sudo systemctl restart crowsnest || exit $LINENO
     sudo systemctl restart klipper || exit $LINENO
     sudo systemctl restart moonraker || exit $LINENO
     echo "Services restarted successfully"
