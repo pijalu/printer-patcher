@@ -4,7 +4,7 @@
 # - nightly: Daily builds with the latest changes
 # - testing: Pre-release builds for testing new features
 # - stable: Production-ready releases
-RELEASE_TYPE=testing
+RELEASE_TYPE=nightly
 
 # Validate release type
 if [[ "$RELEASE_TYPE" != "nightly" && "$RELEASE_TYPE" != "testing" && "$RELEASE_TYPE" != "stable" ]]; then
@@ -143,7 +143,7 @@ find "$CONFIG_DIR" -type f | while read FILE; do
     # Create target directory if it doesn't exist
     TARGET_FILE_DIR=$(dirname "$TARGET_FILE")
     mkdir -p "$TARGET_FILE_DIR" || exit $LINENO
-
+    
     # Special handling for moonraker-obico.cfg
     if [ "$(basename "$TARGET_FILE")" = "moonraker-obico.cfg" ]; then
         # Check if the file doesn't contain the auth_token comment
@@ -152,7 +152,7 @@ find "$CONFIG_DIR" -type f | while read FILE; do
             continue
         fi
     fi
-    
+
     # Check if file exists in target and is different
     if [ -f "$TARGET_FILE" ]; then
         if ! cmp -s "$FILE" "$TARGET_FILE"; then
@@ -174,6 +174,7 @@ done
 # Restart services if changes were made
 if [ "$CHANGES_MADE" -eq 1 ]; then
     echo "Restarting Klipper and Moonraker services..."
+    sudo systemctl restart crowsnest || exit $LINENO
     sudo systemctl restart klipper || exit $LINENO
     sudo systemctl restart moonraker || exit $LINENO
     echo "Services restarted successfully"

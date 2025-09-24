@@ -57,6 +57,17 @@ actions:
         description: "Upgrade moonraker to community version"
         script: "scripts/upgrade-moonraker.sh"
         expected: ".*\\[OK\\]\\ moonraker:\\ https://github\\.com/pijalu/artillery\\-m1\\-moonraker\\.git\\ \\-\\ feature/diy\\-macros"
+  - title: "UNSTABLE - Nighlty klipper"
+    description: "Update/Install latest klipper configs"
+    steps:
+      - title: "Check firmware version"
+        description: "Check the version of the firmware is has expected"
+        script: "scripts/test-version.sh"
+        expected: "Version: 1.00.11.00"
+      - title: "Update Klipper"
+        description: "Update klipper to community version"
+        script: "scripts/update-night-klipper.sh"
+        expected: ".*\\[OK\\] - Klipper update"
   - title: "Webcam upgrade"
     description: "Push Webcam definition to 1920x1080 and use streaming"
     steps:
