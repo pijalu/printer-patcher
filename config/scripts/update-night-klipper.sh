@@ -4,13 +4,7 @@
 # - nightly: Daily builds with the latest changes
 # - testing: Pre-release builds for testing new features
 # - stable: Production-ready releases
-RELEASE_TYPE=testing
-
-# Validate release type
-if [[ "$RELEASE_TYPE" != "nightly" && "$RELEASE_TYPE" != "testing" && "$RELEASE_TYPE" != "stable" ]]; then
-    echo "Error: Invalid release type. Must be one of: nightly, testing, stable"
-    exit $LINENO
-fi
+RELEASE_TYPE=nightly
 
 echo "Fetching latest $RELEASE_TYPE release..."
 

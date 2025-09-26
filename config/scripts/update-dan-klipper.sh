@@ -4,7 +4,7 @@
 # - nightly: Daily builds with the latest changes
 # - testing: Pre-release builds for testing new features
 # - stable: Production-ready releases
-RELEASE_TYPE=testing
+RELEASE_TYPE=testing.dan
 
 echo "Fetching latest $RELEASE_TYPE release..."
 

@@ -57,6 +57,17 @@ actions:
         description: "Upgrade moonraker to community version"
         script: "scripts/upgrade-moonraker.sh"
         expected: ".*\\[OK\\]\\ moonraker:\\ https://github\\.com/pijalu/artillery\\-m1\\-moonraker\\.git\\ \\-\\ feature/diy\\-macros"
+  - title: "Dan Sav's Klipper configs"
+    description: "Update/Install latest Dan Sav's Klipper config"
+    steps:
+      - title: "Check firmware version"
+        description: "Check the version of the firmware is has expected"
+        script: "scripts/test-version.sh"
+        expected: "Version: 1.00.11.00"
+      - title: "Update Klipper"
+        description: "Update klipper to Dan's version"
+        script: "scripts/update-dan-klipper.sh"
+        expected: ".*\\[OK\\] - Klipper update"
   - title: "UNSTABLE - Nighlty klipper"
     description: "Update/Install latest klipper configs"
     steps:
