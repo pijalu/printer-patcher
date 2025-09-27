@@ -34,8 +34,13 @@ else
 fi
 
 if [ "$CHANGES" == "1" ]; then 
+	sudo systemctl stop moonraker || exit $LINENO
+	echo "* Installing moonraker dependencies"
+	source /home/mks/moonraker-env/bin/activate
+	$ARTDO pip install --upgrade -r /home/mks/moonraker/scripts/moonraker-requirements.txt || exit $LINENO
+	#sudo -u artillery python3 -m pip install --no-cache-dir "dbus-fast<=2.28.0" || exit $LINENO
 	echo "* Restarting moonraker (server)"
-    	sudo systemctl restart moonraker || exit $LINENO
+    sudo systemctl start moonraker || exit $LINENO
 fi
 
 REMOTE=`cd /home/mks/moonraker && $ARTDO git config --get remote.origin.url`
