@@ -114,6 +114,12 @@ while read -r FILE; do
 
     if [ -f "$TARGET_FILE" ]; then
         if ! cmp -s "$FILE" "$TARGET_FILE"; then
+            # Special case: Skip variables.cfg to preserve user settings
+            if [ "$(basename "$TARGET_FILE")" = "variables.cfg" ]; then
+                echo "User modified file: $REL_PATH"
+                continue
+            fi
+
             echo "Updating $REL_PATH"
             $ARTDO cp "$TARGET_FILE" "${TARGET_FILE}-$BACKUP_SUFFIX" || exit $LINENO
             $ARTDO cp "$FILE" "$TARGET_FILE" || exit $LINENO
