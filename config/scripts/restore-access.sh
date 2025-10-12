@@ -12,7 +12,7 @@ fi
 
 if [ ! -f /home/mks/printer_data/gcodes/sda1/factory_mode ]; then
     echo "* Enabling factory mode"
-    touch /home/mks/printer_data/gcodes/sda1/factory_mode || exit $LINENO
+    sudo touch /home/mks/printer_data/gcodes/sda1/factory_mode || exit $LINENO
     CHANGES=1
 else
     echo "* Already running in factory mode"
