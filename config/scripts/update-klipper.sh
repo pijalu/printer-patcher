@@ -5,6 +5,7 @@
 # - testing: Pre-release builds for testing new features
 # - stable: Production-ready releases
 RELEASE_TYPE=testing
+ARTDO="sudo -u artillery"
 
 echo "Fetching latest $RELEASE_TYPE release..."
 
@@ -86,12 +87,60 @@ unzip -o "/tmp/$FILENAME" -d "/tmp/klipper-update" || exit $LINENO
 
 CHANGES_MADE=0
 
+# Function to merge variables.cfg files
+merge_variables_cfg() {
+    SOURCE_FILE="$1"
+    TARGET_FILE="$2"
+    TEMP_MERGED="/tmp/variables_merged_$"
+    CHANGES_DETECTED=0
+    
+    # If target doesn't exist, simply copy source to target
+    if [ ! -f "$TARGET_FILE" ]; then
+        $ARTDO cp "$SOURCE_FILE" "$TARGET_FILE" || exit $LINENO
+        return 1  # Return 1 to indicate changes were made (file created)
+    fi
+    
+    # Copy existing target to temporary file
+    cp "$TARGET_FILE" "$TEMP_MERGED"
+    
+    # Process source file to extract only the variable lines (skipping the [Variables] header)
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Skip empty lines and comments
+        if [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*# ]] || [[ "$line" =~ ^[[:space:]]*\[ ]]; then
+            continue
+        fi
+        
+        # Extract variable name (everything before the first '=')
+        if [[ "$line" =~ ^[[:space:]]*([^=]+)= ]]; then
+            var_name="${BASH_REMATCH[1]}"
+            var_name=$(echo "$var_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')  # trim whitespace
+            
+            # Check if this variable already exists in target file
+            if ! grep -q "^[[:space:]]*$var_name[[:space:]]*=" "$TARGET_FILE"; then
+                # Add this variable to the merged file
+                echo "$line" >> "$TEMP_MERGED"
+                CHANGES_DETECTED=1
+            fi
+        fi
+    done < "$SOURCE_FILE"
+    
+    # Only copy the merged file if changes were detected
+    if [ $CHANGES_DETECTED -eq 1 ]; then
+        $ARTDO cp "$TEMP_MERGED" "$TARGET_FILE"
+    fi
+    
+    # Clean up temporary file
+    rm -f "$TEMP_MERGED"
+    
+    # Return whether changes were detected (0 = no changes, 1 = changes made)
+    return $CHANGES_DETECTED
+}
+
 # ---------------------------------------------------------------------
 # Deploy config files
 CONFIG_DIR="/tmp/klipper-update/release/config"
 TARGET_DIR="/home/mks/printer_data/config"
 BACKUP_SUFFIX="pre-$REMOTE_VERSION-$(date +%s)"
-ARTDO="sudo -u artillery"
 
 echo "Deploying files from $CONFIG_DIR to $TARGET_DIR..."
 if [ ! -d "$CONFIG_DIR" ]; then
@@ -114,9 +163,14 @@ while read -r FILE; do
 
     if [ -f "$TARGET_FILE" ]; then
         if ! cmp -s "$FILE" "$TARGET_FILE"; then
-            # Special case: Skip variables.cfg to preserve user settings
+            # Special case: Merge variables.cfg to preserve user settings while adding new ones
             if [ "$(basename "$TARGET_FILE")" = "variables.cfg" ]; then
-                echo "User modified file: $REL_PATH"
+                echo "Merging $REL_PATH"
+                merge_variables_cfg "$FILE" "$TARGET_FILE"
+                if [ $? -eq 1 ]; then
+                    # Function returned 1, meaning changes were made
+                    CHANGES_MADE=1
+                fi
                 continue
             fi
 
