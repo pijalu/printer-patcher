@@ -21,6 +21,15 @@ if [ "$REMOTE" != "https://github.com/pijalu/artillery-m1-moonraker.git" ]; then
 else
 	echo "* Checking version"
 	cd /home/mks/moonraker
+	
+	# Check if there are any uncommitted changes
+	if ! $ARTDO git diff-index --quiet HEAD --; then
+		echo "* Repository is stale - cleaning up"
+		$ARTDO git clean -fd || exit $LINENO
+		$ARTDO git reset --hard HEAD || exit $LINENO
+		CHANGES=1
+	fi
+	
 	if [ "$BRANCH" != "feature/diy-macros" ]; then
 		$ARTDO git checkout feature/diy-macros || exit $LINENO
 		CHANGES=1
