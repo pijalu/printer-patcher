@@ -1,7 +1,7 @@
 #!/bin/bash
 
-VERSION="v0.0.2"
-SHA256="291dd84f14a2c1e149b2b597a45654d48df51d4e7c0f0dc7d5fdd32f9d4d78ab"
+VERSION="v0.0.3"
+SHA256="0df55c456f51526496821befc54ef0910898b2ce2a09439a7ef34e09ded75f33"
 
 # Define file paths
 OTA_SERVER_PATH="/usr/local/bin/ota-server-linux-arm64"
