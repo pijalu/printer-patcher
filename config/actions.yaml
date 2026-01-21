@@ -52,6 +52,13 @@ actions:
         description: "Update/Install Community OTA"
         script: "scripts/community-ota.sh"
         expected: ".*\\[OK\\]"
+  - title: "Camera fixes (testing)"
+    description: "Update/Install fixes for Artillery M1 Pro camera"
+    steps:
+    - title: "Install USB Power rules"
+      description: "Fix apt source list"
+      script: "scripts/usb-power.sh"
+      expected: ".*\\[OK\\]"
   - title: "Community fixes (testing)"
     description: "Update/Install fixes for Artillery M1 Pro (firmware 1.0.11.0 / 1.0.12.0)"
     steps:
