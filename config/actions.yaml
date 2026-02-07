@@ -11,6 +11,12 @@ diagnostics:
   - title: "USB"
     shell: "lsusb -vt"
 actions:
+  - title: "Camera"
+    description: "Try to wake up camera"
+    steps:
+      - title: "Reset dwc2"
+        script: "scripts/wake-cam.sh"
+        expected: ".*\\[OK\\]"
   - title: "FLUIDD"
     description: "(RE)Enable FLUIDD access"
     steps:
