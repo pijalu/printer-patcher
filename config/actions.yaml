@@ -2,6 +2,8 @@
 username: "linaro"
 password: "linaro"
 diagnostics:
+  - title: "dmesg"
+    shell: "dmesg -T"
   - title: "Moonraker logs"
     shell: "sudo tail -fn 100 /home/mks/printer_data/logs/moonraker.log"
   - title: "Klipper logs"
