@@ -22,10 +22,6 @@ actions:
   - title: "FLUIDD"
     description: "(RE)Enable FLUIDD access"
     steps:
-      - title: "Check firmware version"
-        description: "Check the version of the firmware is has expected"
-        script: "scripts/test-version.sh"
-        expected: "Version: 1.00.1[123].00"
       - title: "Restore FLUIDD access"
         description: "Restore fluidd access"
         script: "scripts/restore-access.sh"
